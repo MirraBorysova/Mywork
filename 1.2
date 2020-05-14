@@ -1,0 +1,87 @@
+#include <stdio.h>
+#include <stdlib.h>
+
+//это уже нечто более человеческое, но не совсем продвигает по задаче.
+//здесь только умножение прямоугольных матриц в прямом порядке, о котором я говорила в среду
+
+struct matr{
+    int k;
+    int l;
+    double a[4000];//тут проблема, что нельзя произвольный размер задать
+};
+
+
+
+void umn(double *a,double *b,int k, int l, int y, double *C){
+
+    for(int i = 0; i < k; i++)
+        for(int j = 0; j < y; j++) {
+            C[i*y+j] = 0;
+            for(int p = 0; p < l; p++){
+                C[i*y+j] =C[i*y+j]+( *(a+i*l+p) * *(b+p*y+j));
+            }
+        }
+
+}
+
+
+
+int main() {
+    int n,i,j,h;
+
+    printf("Введите количество матриц: \n");
+    scanf("%d",&n);
+
+   // int *W=(int*)malloc(n*sizeof(int ));
+
+    struct matr go[n];
+
+    printf("Введите размер m*n матрицы №1 \n");
+    scanf("%d",&go[0].k);scanf("%d",&go[0].l);
+    go[1].k=go[0].l;
+
+    for (i = 0; i<n; i++){
+        if(i!=0){printf("Введите размер n матрицы №:%d \n",i);
+        scanf("%d",&go[i].l);}
+
+        if (i<n-1)  go[i+1].k=go[i].l;
+
+        printf("Введите матрицу №:%d: \n",i);
+
+        h=go[i].k*go[i].l;
+        for ( j= 0; j<h; j++){
+            scanf("%lf",&go[i].a[j]);
+        }
+    }
+    i=0;
+    while (i!=n-1) {
+        double *C=(double*)malloc((go[0].k*go[1].l)*sizeof(double ));
+        umn(go[0].a, go[1].a, go[0].k, go[0].l, go[1].l, C);
+        go[0].l=go[1].l;
+
+
+        for(int o = 0; o < go[0].k*go[0].l; o++) go[0].a[o]=C[o];
+
+
+        if(n-i>2){
+        for(int j = 1; j < n-i-1; j++){
+            go[j].k=go[j+1].k; go[j].l=go[j+1].l;
+            for(int o = 0; o < go[j].k*go[j].l; o++) go[j].a[o]=go[j+1].a[o];
+        }
+
+        }
+
+        i++;
+    }
+
+
+        for(int o = 0; o < go[0].k; o++)
+        {for(int j = 0; j < go[0].l; j++) {
+                printf("%.2lf    ",go[0].a[o*go[0].l+j]);
+            }printf("\n");}
+
+
+
+
+    return 0;
+}
