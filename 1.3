@@ -1,0 +1,69 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+double t=1.7976931348623158e+308;
+char u[]="";
+
+//тут предложена улучшенная версия программы 1.1
+//с помощью функции printr будет выводиться схема умножения матриц
+//P.S. постоянно переполняется, из-за того, что не занималась выделением памяти
+
+
+void printr(int i,int j, char *str, double*s,int n) {
+
+
+    if (i == j) {
+        str = strcat(str, "A");
+        sprintf( u, "%d", i );
+        str = strcat(str, u);
+    } else {
+        str = strcat(str, "(");
+        printr(i, *(s+(i-1)*n+j-1), str, s,n);
+        str = strcat(str, "*");
+        printr(*(s+(i-1)*n+j-1) + 1, j,str,s,n);
+        str = strcat(str, ")");
+    }
+}
+
+
+int main() {
+    int n;
+
+    printf("введите n")  ;scanf("%d",&n);
+    char str[]="";
+
+
+    double m[n][n],s[n][n],p[n],s1[n*n];
+
+    for (int j=0;j<n+1;j++){printf("введите %d",j);scanf("%lf",&p[j]);}
+
+
+    for (int l=0;l<n;l++) {
+        for (int i=0;i<n;i++){m[l][i]=0;s[l][i]=0;}}
+
+
+
+    for (int l=1;l<n;l++) {\
+        for (int i=0;i<n-l;i++) {
+            int j=i+l;
+            m[i][j]=t;
+
+            for (int k=i;k<j;k++) {
+                if ((m[k+1][j]+m[i][k]+p[i] * p[k+1] * p[j+1]) < m[i][j])
+                {
+                    m[i][j] = m[k+1][j]+m[i][k]+p[i] * p[k+1] * p[j+1];
+                    s[i][j] = n-k-1;
+                }
+            }
+        }
+
+    }
+
+    s[0][0]=0;
+   // for (int i=0;i<n;i++) {for (int j=0;j<n;j++){printf("%.2lf  ",s[i][j]);}printf("\n");}
+
+   for (int i=0;i<n;i++) {for (int j=0;j<n;j++){*(s1+i*n+j)=s[n-j-1][n-i-1];printf("%.2lf  ",s[i][j]);}printf("\n");}
+  printr(1,n,str,s1,n);
+   printf("\nстрока ==>  %s\n",str);
+    return 0;
+}
