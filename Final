@@ -1,0 +1,159 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <time.h>
+double t=1.7976931348623158e+308;
+
+struct matr//структура записываемых матриц,
+    //максимальное количество элементов в одной матрице-100000
+{
+    int k;
+    int l;
+    double a[40000];
+};
+
+struct um{//вспомогательная структура. сюда будем записывать результат умножения
+    int k;
+    int l;
+    double a[40000];
+};
+
+
+double printr(int i,int j, char *str, int**s)    //эта функция печатает схему по которой выполняется умножение
+{
+
+    if (i == j) {
+        str = strcat(str, "A");
+        char c[100]="";
+        sprintf(c, "%d", i);
+        str = strcat(str, c);
+    }
+    else {
+        str = strcat(str, "(");
+        printr(i, s[i][j], str, s);
+        str = strcat(str, "*");
+        printr(s[i][j]+1, j,str,s);
+        str = strcat(str, ")");
+    }
+    return 0;
+}
+
+struct um umn(struct um mat1,struct um mat2)//функция умножения двух матриц
+{
+    struct um mat;
+    mat.k=mat1.k;
+    mat.l=mat2.l;
+    for(int i = 0; i < mat1.k; i++)
+        for(int j = 0; j < mat2.l; j++) {
+            mat.a[i*mat2.l+j] = 0;
+            for(int p = 0; p < mat2.k; p++){
+                mat.a[i*mat2.l+j] =mat.a[i*mat2.l+j]+( *(mat1.a+i*mat2.k+p) * *(mat2.a+p*mat2.l+j));
+            }
+        }
+    return mat;
+}
+
+struct um final(int **s,struct matr *go,int i,int j) {
+struct um mat1;
+struct um mat2;
+if(j>i){
+    mat1=final(s,go,i,s[i][j]);
+    mat2=final(s,go,s[i][j]+1,j);
+    return umn(mat1,mat2);
+}
+else{ mat1.k=go[i].k;
+    mat1.l=go[i].l;
+    for (int o = 0; o < go[i].k * go[i].l; o++) mat1.a[o] = go[i].a[o];
+    return mat1;}
+}
+
+
+void por(int n,double **m,int **s,struct matr*go)//эта функция считает минимальное количество операций
+// и порядок умножения
+{
+
+    for (int l=1;l<n;l++) {
+        for (int i=0;i<n-l;i++) {
+            int j=i+l;
+            m[i][j]=t;//тут всем элементам присваивается максимально возможное значение для double
+            for (int k=i;k<j;k++) {
+                if ((m[k+1][j]+m[i][k]+go[i].k * go[k].l * go[j].l) < m[i][j])
+                {
+                    m[i][j] = m[k+1][j]+m[i][k]+go[i].k * go[k].l * go[j].l;
+                    s[i][j] = k;
+                }
+            }
+        }
+    }
+
+}
+
+
+int main() {
+    int n, i, j, l;
+    clock_t h;
+
+
+    printf("Введите количество матриц: \n");
+    scanf("%d", &n);
+
+    char *str = (char *) malloc(n * 3 * sizeof(char));
+    int **s = (int **) malloc(n * sizeof(int *));//выделаем память под все, что нам понадобится
+    for (i = 0; i < n; i++) { s[i] = (int *) malloc(n * sizeof(int)); }
+    double **m = (double **) malloc(n * sizeof(double *));
+    for (i = 0; i < n; i++) { m[i] = (double *) malloc(n * sizeof(double)); }
+    struct matr *go= (struct matr *) malloc(n * sizeof(struct matr));
+
+
+    for (int p = 0; p < n; p++) {
+        for (i = 0; i < n; i++) {
+            m[p][i] = 0;
+            s[p][i] = 0;
+        }
+    }
+
+
+    for (i = 0; i < n; i++) {//вводим размеры матриц и сами матрицы
+
+        printf("Введите размер m*n матрицы №:%d \n", i);
+        scanf("%d %d",&go[i].k, &go[i].l);
+
+        if(i!=0) if(go[i].k!=go[i-1].l) {printf("\nС таким размером матрицы нельзя умножить! \n"); exit(1);}
+
+        printf("Введите матрицу №:%d: \n", i+1);
+        for (l = 0; l < (go[i].k); l++)
+            for (j = 0; j < (go[i].l); j++){
+                scanf("%lf", &go[i].a[l*go[i].l+j]);
+
+            }
+    }
+
+
+    por(n, m, s, go);//находим матрицы m и s
+
+    printr(0, n - 1, str, s);//найдем схему умножения матриц
+
+    printf("\nстрока ==> %s\n", str);
+
+    h=clock();
+    struct um o1= final(s,go,0,n-1);//получим результат
+    h=clock()-h;
+
+    printf("\nвремя выполнения ==> %lf секунд\n",((double)h)/CLOCKS_PER_SEC);
+
+    printf("\n\nОтвет\n\n");//выведем ответ
+    for ( i = 0; i < o1.k; i++) {
+        for ( j = 0; j < o1.l; j++) {
+            printf("%lf  ", o1.a[i*o1.l+j]);
+        }
+        printf("\n");
+    }
+
+    free(go);
+    for (i = 0; i < n; i++) { free(m[i]); }
+    free(m);
+    for (i = 0; i < n; i++) { free(s[i]); }
+    free(s);
+    free(str);
+    return 0;
+}
