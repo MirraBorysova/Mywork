@@ -5,14 +5,14 @@
 double t=1.7976931348623158e+308;
 
 struct matr//структура записываемых матриц,
-    //максимальное количество элементов в одной матрице-100000
+    //максимальное количество элементов в одной матрице-40000
 {
     int k;
     int l;
     double a[40000];
 };
 
-void umn(double *a,double *b,int k, int l, int y, double *C){
+void umn(double *a,double *b,int k, int l, int y, double *C){//умножение двух матриц
 
     for(int i = 0; i < k; i++)
         for(int j = 0; j < y; j++) {
@@ -23,7 +23,7 @@ void umn(double *a,double *b,int k, int l, int y, double *C){
         }
 
 }
-void final (struct matr*go,int n){
+void final (struct matr*go,int n){//умножение в прямом порядке
     int i=0;
     while (i!=n-1) {
         double *C=(double*)malloc((go[0].k*go[1].l)*sizeof(double ));
@@ -55,7 +55,7 @@ int main() {
     printf("Введите количество матриц: \n");
     scanf("%d", &n);
 
-    struct matr *go= (struct matr *) malloc(n * sizeof(struct matr));
+    struct matr *go= (struct matr *) malloc(n * sizeof(struct matr));//выделяем память
 
 
 
@@ -75,7 +75,7 @@ int main() {
     }
 
 
-    h=clock();
+    h=clock();//замеряем время
     final(go,n);
     h=clock()-h;
 
