@@ -5,7 +5,7 @@
 double t=1.7976931348623158e+308;
 
 struct matr//структура записываемых матриц,
-    //максимальное количество элементов в одной матрице-100000
+    //максимальное количество элементов в одной матрице-40000
 {
     int k;
     int l;
@@ -53,7 +53,7 @@ struct um umn(struct um mat1,struct um mat2)//функция умножения 
     return mat;
 }
 
-struct um final(int **s,struct matr *go,int i,int j) {
+struct um final(int **s,struct matr *go,int i,int j) {//функция умножения матриц в нужном порядке
 struct um mat1;
 struct um mat2;
 if(j>i){
@@ -135,7 +135,7 @@ int main() {
 
     printf("\nстрока ==> %s\n", str);
 
-    h=clock();
+    h=clock();//замеряем время
     struct um o1= final(s,go,0,n-1);//получим результат
     h=clock()-h;
 
